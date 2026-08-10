@@ -33,6 +33,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByDesignationId(Long designationId);
 
     @Query("""
+            SELECT e.employeeCode FROM Employee e
+            WHERE e.employeeCode LIKE :prefix%
+            """)
+    List<String> findCodesByPrefix(@Param("prefix") String prefix);
+
+    @Query("""
             SELECT e FROM Employee e
             WHERE (:keyword IS NULL
                    OR LOWER(e.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
