@@ -15,7 +15,7 @@ Do not try to build the entire application in a single response. Develop it phas
 Use:
 
 - Java 17+
-- Spring Boot 3.x
+- Spring Boot 4.x
 - Spring Web
 - Spring Data JPA
 - Spring Security
