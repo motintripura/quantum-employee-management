@@ -22,6 +22,8 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
 
     boolean existsByEmployeeIdAndIdNotAndStatus(Long employeeId, Long id, LeaveRequestStatus status);
 
+    long countByLeaveTypeId(Long leaveTypeId);
+
     @Query("""
             SELECT lr FROM LeaveRequest lr
             WHERE (:employeeId IS NULL OR lr.employee.id = :employeeId)

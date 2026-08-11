@@ -20,6 +20,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     List<Attendance> findByAttendanceDateOrderByEmployeeIdAsc(LocalDate date);
 
+    List<Attendance> findByAttendanceDateBetween(LocalDate start, LocalDate end);
+
     long countByAttendanceDateAndStatus(LocalDate date, AttendanceStatus status);
 
     long countByAttendanceDate(LocalDate date);
@@ -27,11 +29,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("""
             SELECT a FROM Attendance a
             WHERE (:employeeId IS NULL OR a.employee.id = :employeeId)
+              AND (:departmentId IS NULL OR a.employee.department.id = :departmentId)
               AND (:status IS NULL OR a.status = :status)
               AND (:fromDate IS NULL OR a.attendanceDate >= :fromDate)
               AND (:toDate IS NULL OR a.attendanceDate <= :toDate)
             """)
     Page<Attendance> search(@Param("employeeId") Long employeeId,
+                            @Param("departmentId") Long departmentId,
                             @Param("status") AttendanceStatus status,
                             @Param("fromDate") LocalDate fromDate,
                             @Param("toDate") LocalDate toDate,
