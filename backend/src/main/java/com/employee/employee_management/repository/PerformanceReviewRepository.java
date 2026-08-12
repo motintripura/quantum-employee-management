@@ -31,4 +31,10 @@ public interface PerformanceReviewRepository extends JpaRepository<PerformanceRe
             ORDER BY pr.rating
             """)
     List<Object[]> countByRating();
+
+    @Query("""
+            SELECT pr FROM PerformanceReview pr
+            ORDER BY pr.createdAt DESC
+            """)
+    List<PerformanceReview> findRecent(Pageable pageable);
 }
