@@ -63,4 +63,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             ORDER BY d.name
             """)
     List<Object[]> countByDepartment();
+
+    @Query("""
+            SELECT e FROM Employee e
+            ORDER BY e.createdAt DESC
+            """)
+    List<Employee> findRecent(Pageable pageable);
 }

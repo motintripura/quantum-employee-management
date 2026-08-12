@@ -50,4 +50,10 @@ public interface PayrollRepository extends JpaRepository<Payroll, Long> {
     BigDecimal sumNetSalaryByMonthAndYear(@Param("month") Integer month, @Param("year") Integer year);
 
     long countByPaymentStatusAndMonthAndYear(PaymentStatus paymentStatus, Integer month, Integer year);
+
+    @Query("""
+            SELECT p FROM Payroll p
+            ORDER BY p.createdAt DESC
+            """)
+    List<Payroll> findRecent(Pageable pageable);
 }

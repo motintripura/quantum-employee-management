@@ -71,4 +71,10 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     List<Object[]> countByStatus();
 
     Optional<LeaveRequest> findByIdAndStatus(Long id, LeaveRequestStatus status);
+
+    @Query("""
+            SELECT lr FROM LeaveRequest lr
+            ORDER BY lr.createdAt DESC
+            """)
+    List<LeaveRequest> findRecent(Pageable pageable);
 }

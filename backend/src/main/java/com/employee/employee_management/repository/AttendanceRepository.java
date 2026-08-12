@@ -48,4 +48,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             GROUP BY a.status
             """)
     List<Object[]> countByStatusForDate(@Param("date") LocalDate date);
+
+    @Query("""
+            SELECT a FROM Attendance a
+            ORDER BY a.createdAt DESC
+            """)
+    List<Attendance> findRecent(Pageable pageable);
 }
