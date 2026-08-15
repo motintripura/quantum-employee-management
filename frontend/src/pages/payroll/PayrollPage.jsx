@@ -53,7 +53,7 @@ export default function PayrollPage() {
 
   const [filters, setFilters] = useState({ employeeId: '', month: '', year: '', paymentStatus: '' });
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(DEFAULT_PAGE_SIZE);
+  const [size] = useState(DEFAULT_PAGE_SIZE);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -67,7 +67,6 @@ export default function PayrollPage() {
   const [saving, setSaving] = useState(false);
 
   const [payslip, setPayslip] = useState(null);
-  const [payslipLoading, setPayslipLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -194,14 +193,11 @@ export default function PayrollPage() {
 
   const openPayslip = async (p) => {
     setPayslip(null);
-    setPayslipLoading(true);
     try {
       const slip = await payrollService.getPayslip(p.id);
       setPayslip(slip);
     } catch (e) {
       toastError(getErrorMessage(e));
-    } finally {
-      setPayslipLoading(false);
     }
   };
 

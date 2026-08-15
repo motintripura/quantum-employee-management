@@ -10,6 +10,7 @@ import com.employee.employee_management.entity.User;
 import com.employee.employee_management.exception.BadRequestException;
 import com.employee.employee_management.exception.DuplicateResourceException;
 import com.employee.employee_management.exception.ResourceNotFoundException;
+import com.employee.employee_management.exception.UnauthorizedException;
 import com.employee.employee_management.mapper.EmployeeMapper;
 import com.employee.employee_management.repository.DepartmentRepository;
 import com.employee.employee_management.repository.DesignationRepository;
@@ -22,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,13 +67,21 @@ public class EmployeeServiceImpl implements EmployeeService {
                                                  Pageable pageable) {
         Page<Employee> page = employeeRepository.search(
                 normalizeKeyword(keyword), departmentId, designationId, status, pageable);
-        return PageResponse.from(page.map(EmployeeMapper::toResponse));
+        List<EmployeeResponse> content = page.getContent().stream()
+                .map(EmployeeMapper::toResponse)
+                .toList();
+        content.forEach(response -> response.setRole(roleFor(response.getId())));
+        return new PageResponse<>(content, page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.getTotalPages(), page.isLast());
     }
 
     @Override
     @Transactional(readOnly = true)
     public EmployeeResponse getById(Long id) {
-        return EmployeeMapper.toResponse(findEmployee(id));
+        Employee employee = findEmployee(id);
+        EmployeeResponse response = EmployeeMapper.toResponse(employee);
+        response.setRole(roleFor(employee.getId()));
+        return response;
     }
 
     @Override
@@ -109,17 +120,21 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
         employeeRepository.save(employee);
 
+        Role role = request.getRole() == null ? Role.EMPLOYEE : request.getRole();
+        assertCanAssignRole(role);
+
         User user = User.builder()
                 .username(employeeCode)
                 .email(email)
                 .password(passwordEncoder.encode(Constants.DEFAULT_USER_PASSWORD))
-                .role(Role.EMPLOYEE)
+                .role(role)
                 .employee(employee)
                 .enabled(true)
                 .build();
         userRepository.save(user);
 
         EmployeeResponse response = EmployeeMapper.toResponse(employee);
+        response.setRole(role);
         response.setTemporaryPassword(Constants.DEFAULT_USER_PASSWORD);
         return response;
     }
@@ -162,12 +177,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         employeeRepository.save(employee);
 
+        EmployeeResponse response = EmployeeMapper.toResponse(employee);
         userRepository.findByEmployeeId(id).ifPresent(user -> {
             user.setEmail(email);
+            if (request.getRole() != null) {
+                assertCanAssignRole(request.getRole());
+                user.setRole(request.getRole());
+            }
             userRepository.save(user);
+            response.setRole(user.getRole());
         });
+        if (response.getRole() == null) {
+            response.setRole(Role.EMPLOYEE);
+        }
 
-        return EmployeeMapper.toResponse(employee);
+        return response;
     }
 
     @Override
@@ -184,7 +208,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = findEmployee(id);
         employee.setStatus(!Boolean.TRUE.equals(employee.getStatus()));
         employeeRepository.save(employee);
-        return EmployeeMapper.toResponse(employee);
+        EmployeeResponse response = EmployeeMapper.toResponse(employee);
+        response.setRole(roleFor(employee.getId()));
+        return response;
     }
 
     @Override
@@ -216,7 +242,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             Files.copy(file.getInputStream(), dir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
             employee.setProfileImage("/uploads/" + filename);
             employeeRepository.save(employee);
-            return EmployeeMapper.toResponse(employee);
+            EmployeeResponse response = EmployeeMapper.toResponse(employee);
+            response.setRole(roleFor(employee.getId()));
+            return response;
         } catch (IOException ex) {
             throw new BadRequestException("Failed to upload image: " + ex.getMessage());
         }
@@ -260,5 +288,28 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private String normalizeKeyword(String keyword) {
         return keyword == null || keyword.isBlank() ? null : keyword.trim();
+    }
+
+    private Role roleFor(Long employeeId) {
+        return userRepository.findByEmployeeId(employeeId).map(User::getRole).orElse(Role.EMPLOYEE);
+    }
+
+    private void assertCanAssignRole(Role role) {
+        if (role == Role.ADMIN) {
+            throw new BadRequestException("ADMIN role cannot be assigned to an employee");
+        }
+        if ((role == Role.HR || role == Role.MANAGER) && currentUserRole() != Role.ADMIN) {
+            throw new UnauthorizedException("Only an ADMIN can assign HR or Manager roles");
+        }
+    }
+
+    private Role currentUserRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return null;
+        }
+        return userRepository.findByUsername(authentication.getName())
+                .map(User::getRole).orElse(null);
     }
 }
