@@ -1,6 +1,7 @@
 package com.employee.employee_management.service.impl;
 
 import com.employee.employee_management.dto.AuthResponse;
+import com.employee.employee_management.dto.EmployeeResponse;
 import com.employee.employee_management.dto.LoginRequest;
 import com.employee.employee_management.dto.RegisterRequest;
 import com.employee.employee_management.dto.UserResponse;
@@ -9,6 +10,7 @@ import com.employee.employee_management.entity.User;
 import com.employee.employee_management.exception.DuplicateResourceException;
 import com.employee.employee_management.exception.ResourceNotFoundException;
 import com.employee.employee_management.exception.UnauthorizedException;
+import com.employee.employee_management.mapper.EmployeeMapper;
 import com.employee.employee_management.mapper.UserMapper;
 import com.employee.employee_management.repository.EmployeeRepository;
 import com.employee.employee_management.repository.UserRepository;
@@ -85,9 +87,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional(readOnly = true)
     public UserResponse getCurrentUser() {
+        return UserMapper.toResponse(getCurrentUserEntity());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public EmployeeResponse getMyProfile() {
+        User user = getCurrentUserEntity();
+        Employee employee = user.getEmployee();
+        if (employee == null) {
+            throw new ResourceNotFoundException("No employee profile is linked to this user");
+        }
+        return EmployeeMapper.toResponse(employee);
+    }
+
+    private User getCurrentUserEntity() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return UserMapper.toResponse(user);
     }
 }

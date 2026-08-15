@@ -1,6 +1,7 @@
 package com.employee.employee_management.controller;
 
 import com.employee.employee_management.dto.AuthResponse;
+import com.employee.employee_management.dto.EmployeeResponse;
 import com.employee.employee_management.dto.LoginRequest;
 import com.employee.employee_management.dto.RegisterRequest;
 import com.employee.employee_management.dto.UserResponse;
@@ -35,5 +36,10 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> me() {
         return ResponseEntity.ok(ApiResponse.success(authService.getCurrentUser()));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<EmployeeResponse>> profile() {
+        return ResponseEntity.ok(ApiResponse.success(authService.getMyProfile()));
     }
 }
