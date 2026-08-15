@@ -1,6 +1,7 @@
 package com.employee.employee_management.dto;
 
 import com.employee.employee_management.entity.Gender;
+import com.employee.employee_management.entity.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,4 +57,6 @@ public class EmployeeRequest {
     private String profileImage;
 
     private Boolean status;
+
+    private Role role;
 }

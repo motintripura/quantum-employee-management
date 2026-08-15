@@ -10,7 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getErrorMessage, getFieldErrors } from '../../services/api';
 import { formatMoney, formatDate, formatTime, fullName } from '../../utils/formatters';
-import { UPLOADS_BASE_URL, RATING_LABELS } from '../../utils/constants';
+import { UPLOADS_BASE_URL, RATING_LABELS, ROLE_LABELS } from '../../utils/constants';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorAlert from '../../components/common/ErrorAlert';
@@ -48,7 +48,7 @@ export default function EmployeeDetails() {
   const [deleteTarget, setDeleteTarget] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [regForm, setRegForm] = useState({ username: '', email: '', password: '' });
+  const [regForm, setRegForm] = useState({ username: '', email: '', password: '', role: 'EMPLOYEE' });
   const [regErrors, setRegErrors] = useState({});
   const [regSubmitting, setRegSubmitting] = useState(false);
 
@@ -129,6 +129,7 @@ export default function EmployeeDetails() {
       username: employee.employeeCode || '',
       email: employee.email || '',
       password: tempPassword || 'Default@123',
+      role: employee.role || 'EMPLOYEE',
     });
     setRegErrors({});
     setShowRegister(true);
@@ -149,10 +150,10 @@ export default function EmployeeDetails() {
         username: regForm.username.trim(),
         email: regForm.email.trim(),
         password: regForm.password,
-        role: 'EMPLOYEE',
+        role: regForm.role || 'EMPLOYEE',
         employeeId: Number(id),
       });
-      success(`Login account ${registered.username} created`);
+      success(`Login account ${registered.username} saved`);
       setShowRegister(false);
     } catch (err) {
       const fe = getFieldErrors(err);
@@ -275,6 +276,7 @@ export default function EmployeeDetails() {
                 <InfoItem label="Phone" value={employee.phone} />
                 <InfoItem label="Department" value={employee.departmentName} />
                 <InfoItem label="Designation" value={employee.designationName} />
+                <InfoItem label="Login Role" value={employee.role ? ROLE_LABELS[employee.role] : 'Employee'} />
                 <InfoItem label="Gender" value={employee.gender ? employee.gender.toLowerCase() : null} />
                 <InfoItem label="Date of Birth" value={formatDate(employee.dateOfBirth)} />
                 <InfoItem label="Joining Date" value={formatDate(employee.joiningDate)} />
@@ -431,13 +433,29 @@ export default function EmployeeDetails() {
             <div className="modal-content">
               <form onSubmit={handleRegister} noValidate>
                 <div className="modal-header">
-                  <h5 className="modal-title">Create Login Account</h5>
+                  <h5 className="modal-title">Manage Login Account</h5>
                   <button type="button" className="btn-close" onClick={() => setShowRegister(false)} />
                 </div>
                 <div className="modal-body">
                   <p className="small text-muted mb-3">
-                    Create a login account for <strong>{fullName(employee)}</strong> with the Employee role.
+                    Configure the login account for <strong>{fullName(employee)}</strong>. This updates their existing
+                    account, credentials, and access role.
                   </p>
+                  <div className="mb-3">
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-select"
+                      value={regForm.role}
+                      onChange={(e) => setRegForm({ ...regForm, role: e.target.value })}
+                      disabled={user.role !== 'ADMIN'}
+                    >
+                      {['EMPLOYEE', 'HR', 'MANAGER'].map((r) => (
+                        <option key={r} value={r}>
+                          {ROLE_LABELS[r]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="mb-3">
                     <label className="form-label">Username</label>
                     <input
@@ -474,7 +492,7 @@ export default function EmployeeDetails() {
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary" disabled={regSubmitting}>
-                    {regSubmitting ? 'Creating...' : 'Create Account'}
+                    {regSubmitting ? 'Saving...' : 'Save Account'}
                   </button>
                 </div>
               </form>

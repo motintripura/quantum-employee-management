@@ -18,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -118,8 +120,6 @@ class AuthServiceImplTest {
 
     @Test
     void register_employeeNotFound_throwsNotFound() {
-        when(userRepository.existsByUsername("hr3")).thenReturn(false);
-        when(userRepository.existsByEmailIgnoreCase("hr3@ems.com")).thenReturn(false);
         when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
 
         RegisterRequest request = RegisterRequest.builder()
@@ -135,6 +135,11 @@ class AuthServiceImplTest {
 
     @Test
     void register_validRequest_createsUser() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("admin", "n/a",
+                        java.util.List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        when(userRepository.findByUsername("admin"))
+                .thenReturn(Optional.of(User.builder().id(1L).username("admin").role(Role.ADMIN).build()));
         when(userRepository.existsByUsername("hr4")).thenReturn(false);
         when(userRepository.existsByEmailIgnoreCase("hr4@ems.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encoded-password");
@@ -153,5 +158,6 @@ class AuthServiceImplTest {
         assertEquals("hr4", response.getUsername());
         assertEquals(Role.HR, response.getRole());
         verify(userRepository).save(any(User.class));
+        SecurityContextHolder.clearContext();
     }
 }

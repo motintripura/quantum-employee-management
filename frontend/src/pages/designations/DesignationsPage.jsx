@@ -24,7 +24,7 @@ export default function DesignationsPage() {
 
   const [filters, setFilters] = useState({ keyword: '', departmentId: '', status: '' });
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(DEFAULT_PAGE_SIZE);
+  const [size] = useState(DEFAULT_PAGE_SIZE);
   const [data, setData] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);

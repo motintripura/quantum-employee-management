@@ -36,7 +36,7 @@ export default function AttendancePage() {
     toDate: '',
   });
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(DEFAULT_PAGE_SIZE);
+  const [size] = useState(DEFAULT_PAGE_SIZE);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');

@@ -4,8 +4,9 @@ import employeeService from '../../services/employee.service';
 import departmentService from '../../services/department.service';
 import designationService from '../../services/designation.service';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import { getErrorMessage, getFieldErrors } from '../../services/api';
-import { GENDERS } from '../../utils/constants';
+import { GENDERS, ROLE_LABELS } from '../../utils/constants';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorAlert from '../../components/common/ErrorAlert';
@@ -24,6 +25,7 @@ const EMPTY_FORM = {
   designationId: '',
   salary: '',
   status: true,
+  role: 'EMPLOYEE',
 };
 
 export default function EmployeeForm() {
@@ -31,6 +33,7 @@ export default function EmployeeForm() {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [departments, setDepartments] = useState([]);
@@ -72,6 +75,7 @@ export default function EmployeeForm() {
             designationId: emp.designationId || '',
             salary: emp.salary != null ? emp.salary : '',
             status: emp.status,
+            role: emp.role || 'EMPLOYEE',
           });
           if (depts.some((d) => d.id === emp.departmentId)) {
             const desigs = await designationService.getActive(emp.departmentId);
@@ -156,6 +160,7 @@ export default function EmployeeForm() {
       designationId: Number(form.designationId),
       salary: form.salary === '' ? null : Number(form.salary),
       status: form.status,
+      role: form.role || 'EMPLOYEE',
     };
 
     setSubmitting(true);
@@ -366,6 +371,24 @@ export default function EmployeeForm() {
                 />
                 {fieldErrors.salary && <div className="invalid-feedback">{fieldErrors.salary}</div>}
               </div>
+              {user.role === 'ADMIN' && (
+                <div className="col-md-4">
+                  <label className="form-label">Login Role</label>
+                  <select
+                    className="form-select"
+                    name="role"
+                    value={form.role || 'EMPLOYEE'}
+                    onChange={handleChange}
+                  >
+                    {['EMPLOYEE', 'HR', 'MANAGER'].map((r) => (
+                      <option key={r} value={r}>
+                        {ROLE_LABELS[r]}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="form-text">Controls which pages this employee can access.</div>
+                </div>
+              )}
               <div className="col-md-4 d-flex align-items-center">
                 <div className="form-check form-switch">
                   <input
