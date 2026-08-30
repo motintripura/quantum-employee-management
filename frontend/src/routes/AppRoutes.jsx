@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 import AdminLayout from '../layouts/AdminLayout';
+import LandingPage from '../pages/LandingPage';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import EmployeesList from '../pages/employees/EmployeesList';
@@ -15,14 +15,12 @@ import PayrollPage from '../pages/payroll/PayrollPage';
 import PerformancePage from '../pages/performance/PerformancePage';
 import ProfilePage from '../pages/profile/ProfilePage';
 import SettingsPage from '../pages/settings/SettingsPage';
-import { homePathForRole } from '../utils/constants';
+import ReportsPage from '../pages/reports/ReportsPage';
 
 export default function AppRoutes() {
-  const { user } = useAuth();
-  const homePath = homePathForRole(user ? user.role : undefined);
-
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
 
       <Route
@@ -138,10 +136,17 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute roles={['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']}>
+              <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
-      <Route path="/" element={<Navigate to={homePath} replace />} />
-      <Route path="*" element={<Navigate to={homePath} replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

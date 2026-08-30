@@ -36,3 +36,58 @@
     transform: rotate(360deg);
   }
 }
+
+@media print {
+  .report-printable > *:not(.report-table-print) {
+    display: none !important;
+  }
+
+  .app-sidebar,
+  .sidebar-backdrop,
+  .app-navbar,
+  .btn,
+  .export-buttons,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block !important;
+  }
+
+  .app-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .app-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .report-printable {
+    padding: 10px !important;
+  }
+
+  .report-table-print {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+
+  .report-table-print .card-header {
+    display: block !important;
+  }
+
+  .report-table-print table {
+    font-size: 11px !important;
+  }
+
+  .report-table-print .table-responsive {
+    overflow: visible !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+}

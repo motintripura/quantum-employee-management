@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/leaves', label: 'Leaves', icon: 'bi-calendar2-week', roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
   { to: '/payroll', label: 'Payroll', icon: 'bi-cash-stack', roles: ['ADMIN', 'HR'] },
   { to: '/performance', label: 'Performance', icon: 'bi-graph-up', roles: ['ADMIN', 'HR', 'MANAGER'] },
+  { to: '/reports', label: 'Reports', icon: 'bi-file-earmark-bar-graph', roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
   { to: '/settings', label: 'Settings', icon: 'bi-gear', roles: ['ADMIN'] },
   { to: '/profile', label: 'My Profile', icon: 'bi-person-circle', roles: ['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'] },
 ];
