@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import payrollService from '../../services/payroll.service';
 import employeeService from '../../services/employee.service';
 import { useAuth } from '../../context/AuthContext';
@@ -207,10 +208,16 @@ export default function PayrollPage() {
         title="Payroll"
         subtitle="Generate and manage employee salaries"
         actions={
-          <button type="button" className="btn btn-primary" onClick={openCreate}>
-            <i className="bi bi-plus-lg me-1" />
-            Generate Payroll
-          </button>
+          <div className="d-flex gap-2">
+            <Link to="/reports?type=payroll" className="btn btn-outline-secondary btn-sm">
+              <i className="bi bi-bar-chart me-1" />
+              Report
+            </Link>
+            <button type="button" className="btn btn-primary" onClick={openCreate}>
+              <i className="bi bi-plus-lg me-1" />
+              Generate Payroll
+            </button>
+          </div>
         }
       />
 

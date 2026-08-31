@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import performanceService from '../../services/performance.service';
 import employeeService from '../../services/employee.service';
 import { useAuth } from '../../context/AuthContext';
@@ -157,10 +158,16 @@ export default function PerformancePage() {
         title="Performance Reviews"
         subtitle="Track and manage employee performance ratings"
         actions={
-          <button type="button" className="btn btn-primary" onClick={openCreate}>
-            <i className="bi bi-plus-lg me-1" />
-            Add Review
-          </button>
+          <div className="d-flex gap-2">
+            <Link to="/reports?type=performance" className="btn btn-outline-secondary btn-sm">
+              <i className="bi bi-bar-chart me-1" />
+              Report
+            </Link>
+            <button type="button" className="btn btn-primary" onClick={openCreate}>
+              <i className="bi bi-plus-lg me-1" />
+              Add Review
+            </button>
+          </div>
         }
       />
 

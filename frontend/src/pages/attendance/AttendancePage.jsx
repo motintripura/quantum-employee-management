@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import attendanceService from '../../services/attendance.service';
 import employeeService from '../../services/employee.service';
 import departmentService from '../../services/department.service';
@@ -172,6 +173,10 @@ export default function AttendancePage() {
         subtitle="Track attendance and working hours"
         actions={
           <div className="d-flex gap-2">
+            <Link to="/reports?type=attendance" className="btn btn-outline-secondary btn-sm">
+              <i className="bi bi-bar-chart me-1" />
+              Report
+            </Link>
             <div className="btn-group">
               <button
                 type="button"

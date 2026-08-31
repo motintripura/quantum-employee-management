@@ -132,12 +132,18 @@ export default function EmployeesList() {
         title="Employees"
         subtitle="Manage your workforce"
         actions={
-          isEditor && (
-            <Link to="/employees/add" className="btn btn-primary">
-              <i className="bi bi-person-plus me-1" />
-              Add Employee
+          <div className="d-flex gap-2">
+            <Link to="/reports?type=employee" className="btn btn-outline-secondary btn-sm">
+              <i className="bi bi-bar-chart me-1" />
+              Report
             </Link>
-          )
+            {isEditor && (
+              <Link to="/employees/add" className="btn btn-primary">
+                <i className="bi bi-person-plus me-1" />
+                Add Employee
+              </Link>
+            )}
+          </div>
         }
       />
 

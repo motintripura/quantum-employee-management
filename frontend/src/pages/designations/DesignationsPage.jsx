@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import designationService from '../../services/designation.service';
 import departmentService from '../../services/department.service';
 import { useAuth } from '../../context/AuthContext';
@@ -165,12 +166,18 @@ export default function DesignationsPage() {
         title="Designations"
         subtitle="Job roles across departments"
         actions={
-          isEditor && (
-            <button type="button" className="btn btn-primary" onClick={openCreate}>
-              <i className="bi bi-plus-lg me-1" />
-              Add Designation
-            </button>
-          )
+          <div className="d-flex gap-2">
+            <Link to="/reports?type=designation" className="btn btn-outline-secondary btn-sm">
+              <i className="bi bi-bar-chart me-1" />
+              Report
+            </Link>
+            {isEditor && (
+              <button type="button" className="btn btn-primary" onClick={openCreate}>
+                <i className="bi bi-plus-lg me-1" />
+                Add Designation
+              </button>
+            )}
+          </div>
         }
       />
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   ResponsiveContainer,
   BarChart,
@@ -496,8 +497,10 @@ function renderCharts(type, chartData) {
 export default function ReportsPage() {
   const { user } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
+  const [searchParams] = useSearchParams();
 
-  const [reportType, setReportType] = useState('employee');
+  const initialType = searchParams.get('type') || 'employee';
+  const [reportType, setReportType] = useState(initialType);
   const [filters, setFilters] = useState({});
   const [data, setData] = useState([]);
   const [summary, setSummary] = useState(null);

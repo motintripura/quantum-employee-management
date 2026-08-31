@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import leaveService, { leaveTypeService } from '../../services/leave.service';
 import employeeService from '../../services/employee.service';
 import { useAuth } from '../../context/AuthContext';
@@ -162,10 +163,16 @@ export default function LeavesPage() {
         title="Leave Management"
         subtitle={isEmployee ? 'My leave requests' : 'Review and manage leave requests'}
         actions={
-          <button type="button" className="btn btn-primary" onClick={openModal}>
-            <i className="bi bi-plus-lg me-1" />
-            Apply Leave
-          </button>
+          <div className="d-flex gap-2">
+            <Link to="/reports?type=leave" className="btn btn-outline-secondary btn-sm">
+              <i className="bi bi-bar-chart me-1" />
+              Report
+            </Link>
+            <button type="button" className="btn btn-primary" onClick={openModal}>
+              <i className="bi bi-plus-lg me-1" />
+              Apply Leave
+            </button>
+          </div>
         }
       />
 
